@@ -1,0 +1,331 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include<conio.h>
+#include <string.h>
+//create account function
+int i = 0;
+typedef struct customer
+{
+    int custacno;
+    char custacname[20];
+    char custpassword[10];
+    char custaddress[20];
+    char email[10];
+    float custbankbalance;
+    float payment;
+
+}cust;
+
+void createaccount()
+{
+
+    FILE *fp;
+    cust data[100];
+    fp = fopen("D://customerfile.dat","ab+");
+    if(fp == NULL)
+    {
+        printf("unable to open file\n");
+        exit(20);
+    }
+    i++;
+    //entry of values into the structure
+    printf("your random account no is %d\n", i);
+    printf("Enter your name\n");
+    scanf("%c ", data[i].custacname);
+    fflush(stdin);
+    printf("Enter your password\n");
+    scanf("%c ", data[i].custpassword);
+    fflush(stdin);
+    printf("Enter your address\n");
+    scanf("%s", data[i].custaddress);
+       fflush(stdin);
+    printf("Enter your email address\n");
+    scanf("%s", data[i].email);
+    printf("Enter your bank balance/ deposit\n");
+    scanf("%f", &data[i].custbankbalance);
+    printf("Enter your payment\n");
+    scanf("%f", &data[i].payment);
+
+    printf("remember your given id very well they will be used to access your account\n");
+    printf("your account no is important its your id\n");
+    printf("your account id  no is %d", i);
+
+    //write values into structure data
+
+fseek(fp, (i - 1) * sizeof(cust),SEEK_SET); //move file pointer to the beginning of first last account
+
+    fwrite(data,sizeof(cust),100,fp);
+    fclose(fp);
+}
+
+//function to update account
+void update()
+{
+    int option;
+
+    FILE *fp;
+    fp = fopen("D://customerfile.dat","ab+");
+    cust data[100];
+
+    printf("to update your account name , press 1.\n");
+    printf("to update your account email, press 2.\n");
+    printf("to update your account password, press 3.\n");
+    printf("to update your account address, press 4.\n");
+
+    printf("Enter your option\n");
+    scanf("%d", &option);
+
+    switch(option)
+    {
+case 1:
+    //locate
+    {int id;
+    printf("Enter your account id\n");
+    scanf("%d" , &id);
+    char newname[20];
+    fflush(stdin);
+    printf("Enter your new name\n");
+    scanf("%[^\n]s", newname);
+    fseek(fp,(id - 1) * sizeof(cust),SEEK_SET);
+    //read into memory
+    fread(data,sizeof(cust),100,fp);
+    //change field
+    strcpy(data[id].custacname,newname);
+
+    //reposition pointer
+    fseek(fp,(id - 1) * sizeof(cust),SEEK_SET);
+    fwrite(data,sizeof(cust),100,fp);
+    fclose(fp);}
+    break;
+case 2:
+      {int id;
+         printf("Enter your account id\n");
+    scanf("%d" , &id);
+    char newemail;
+    fflush(stdin);
+    printf("Enter your new email\n");
+    gets(newemail);
+    fflush(stdout);
+    //locate
+    fseek(fp,(id - 1) * sizeof(cust),SEEK_SET);
+    //read into memory
+    fread(data,sizeof(cust),100,fp);
+    //change field
+    strcpy(data[id].email,newemail);
+    //reposition pointer
+    fseek(fp,(id - 1)* sizeof(cust),SEEK_SET);
+    //write into file
+    fwrite(data,sizeof(cust),100,fp);
+    fclose(fp);}
+    break;
+case 3:
+    {int id;
+    printf("Enter your account id\n");
+    scanf("%d" , &id);
+    char newpassword;
+    printf("Enter your new password\n");
+    gets(newpassword);
+    //locate
+    fseek(fp,(id -1)*sizeof(cust),SEEK_SET);
+    //read into memory
+    fread(data,sizeof(cust),100,fp);
+    //change field
+    strcpy(data[id].custpassword,newpassword);
+    //reposition pointer
+    fseek(fp,(id - 1)* sizeof(cust),SEEK_SET);
+    //write into file
+    fwrite(data,sizeof(cust),100,fp);
+    }
+    break;
+case 4:
+    {int id;
+    printf("Enter your account id\n");
+    scanf("%d" , &id);
+    char newaddress;
+    printf("Enter your new address\n");
+    gets(newaddress);
+    //locate
+    fseek(fp,(id  -1)*sizeof(cust),SEEK_SET);
+    //read into memory
+    fread(data,sizeof(cust),100,fp);
+    //change field
+    strcpy(data[id].custaddress,newaddress);
+    //reposition pointer
+    fseek(fp,(id - 1)*sizeof(cust),fp);
+    //write into file from memory
+    fwrite(data,sizeof(cust),100,fp);
+    fclose(fp);}
+    break;
+default:
+    {char y;
+    printf("you have not entered the write option\nwant to try again press y\n");
+    scanf("%c", &y);
+
+    if(y == 'y')
+            update();
+    }
+    }
+
+
+}
+
+void searching()
+{
+    int id;
+    printf("what account are you searching for?\nEnter number of your account\n");
+    scanf("%d", &id);
+    //open file file in read mode
+    FILE *fp;
+    cust data[100];
+    if((fp = fopen("D://customerfile.dat","rb")) == NULL)
+    {
+        printf("cant open file \n");
+        exit(30);
+    }
+
+    //locate account
+    fseek(fp,(id- 1) *sizeof(cust),SEEK_SET);
+    //read into memory
+    fread(data,sizeof(cust),100,fp);
+    //search by number
+    if(data[id].custacno == id)
+    {
+        printf("found!!\n");
+    }
+    else
+    {
+        printf("account not available\n");
+    }
+
+    //reposition pointer
+    fseek(fp,(id -1 )*sizeof(cust),SEEK_SET);
+    //write back into file
+    fwrite(data,sizeof(cust),100,fp);
+    fclose(fp);
+
+}
+
+void deleting()
+{
+    int id;
+    printf("Enter of account to delete\n");
+    scanf("%d", &id);
+
+    //open file
+    FILE *fp;
+    cust data[100];
+    if((fp = fopen("D://customerfile.dat","rb+")== NULL))
+    {
+        printf("Can't open account\n");
+        exit(0);
+    }
+
+    //locate account
+    fseek(fp,(id - 1)*sizeof(cust),SEEK_SET);
+    //read into memory
+    fread(data,sizeof(cust),100,fp);
+    //nullify account
+    data[id].custacno = 0;
+    //reposition pointer
+    fseek(fp,(id -1)*sizeof(cust),SEEK_SET);
+    //write into file
+    fwrite(data,sizeof(cust),100,fp);
+    fclose(fp);
+
+}
+
+void renaming()
+{
+    char newaccname;
+    printf("Enter new name of your account\n");
+    gets(newaccname);
+    FILE *fp;
+    cust data[100];
+    fp = fopen("D:customerfile.dat","rb+");
+    if(fp == NULL)
+    {
+        printf("problem opening account\n");
+        exit(3);
+    }
+
+    rename("D:customerfile.dat",newaccname);
+    fclose(fp);
+
+}
+
+void display()
+{
+    int id;
+    printf("Enter your account id\n");
+    scanf("%d",&id);
+    FILE *fp;
+    cust data[100];
+    fp = fopen("D://customerfile.dat","rb+");
+    if(fp == NULL)
+    {
+        printf("error opening file\n");
+        exit(0);
+    }
+
+    //locate
+    fseek(fp,(id - 1)*sizeof(cust),SEEK_SET);
+    //read into memory
+    fread(data,sizeof(cust),100,fp);
+    //display info
+    printf("%d",data[id].custacno);
+    printf("%s",data[id].custacname);
+    printf("%s",data[id].custaddress);
+    printf("%s",data[id].email);
+    printf("%f",data[id].custbankbalance);
+
+    //reposition pointer
+    fseek(fp,(id - 1)*sizeof(cust),SEEK_SET);
+    //write back data
+    fwrite(data,sizeof(cust),100,fp);
+
+    fclose(fp);
+
+}
+int main()
+{
+
+int option;
+printf("press 1 to create an account\n");
+printf("press 2 to update account\n");
+printf("press 3 to search account\n");
+printf("press 4 to delete account\n");
+printf("press 5 to display all your account details\n");
+
+printf("Enter your option\n");
+scanf("%d", &option);
+
+switch(option)
+{
+    case 1:
+    createaccount();
+    break;
+    case 2:
+    update();
+    break;
+    case 3:
+    searching();
+    break;
+    case 4:
+        deleting();
+        break;
+    case 5:
+        display();
+        break;
+
+    default:
+        {
+            char y ;
+            printf("do you want to operate accounts again?,press y\n");
+            scanf("%c", &y);
+            if(y == 'y')
+                main();
+
+        }
+}
+
+}
